@@ -56,11 +56,13 @@ export function useHabits() {
       supabase
         .from('habits')
         .select('*')
+        .eq('user_id', user.id)
         .is('archived_at', null)
         .order('created_at'),
       supabase
         .from('check_ins')
         .select('*')
+        .eq('user_id', user.id)
         .gte('for_date', weekStart),
     ]);
 

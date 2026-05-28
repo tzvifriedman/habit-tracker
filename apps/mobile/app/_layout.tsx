@@ -1,9 +1,14 @@
 import 'react-native-url-polyfill/auto';
 import { useEffect } from 'react';
-import { AppState } from 'react-native';
+import { AppState, View } from 'react-native';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Notifications from 'expo-notifications';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { setupNotificationHandler } from '../src/lib/notifications';
+
+setupNotificationHandler();
 import {
   useFonts,
   Fraunces_300Light,
@@ -44,7 +49,24 @@ function RootNavigator() {
     return () => sub.remove();
   }, []);
 
+  useEffect(() => {
+    // Navigate to the dashboard when the user taps a notification
+    const sub = Notifications.addNotificationResponseReceivedListener(() => {
+      router.push('/(app)/');
+    });
+    return () => sub.remove();
+  }, []);
+
   return <Slot />;
+}
+
+function SafeAreaTop() {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={{ flex: 1, paddingTop: insets.top }}>
+      <RootNavigator />
+    </View>
+  );
 }
 
 export default function RootLayout() {
@@ -63,9 +85,11 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <AuthProvider>
-      <StatusBar style="dark" backgroundColor="#F1ECE2" />
-      <RootNavigator />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <StatusBar style="dark" backgroundColor="#F1ECE2" />
+        <SafeAreaTop />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

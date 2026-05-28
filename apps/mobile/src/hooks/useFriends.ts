@@ -50,18 +50,19 @@ export function useFriends() {
     ]);
 
     if (!acceptedRes.error) {
-      const enriched = (acceptedRes.data ?? []).map((f: any) => ({
-        ...f,
-        friend: f.requester_id === user.id ? f.addressee : f.requester,
-      }));
+      const enriched = (acceptedRes.data ?? [])
+        .map((f: any) => ({
+          ...f,
+          friend: f.requester_id === user.id ? f.addressee : f.requester,
+        }))
+        .filter((f: any) => f.friend != null);
       setFriends(enriched);
     }
 
     if (!incomingRes.error) {
-      const enriched = (incomingRes.data ?? []).map((f: any) => ({
-        ...f,
-        friend: f.requester,
-      }));
+      const enriched = (incomingRes.data ?? [])
+        .map((f: any) => ({ ...f, friend: f.requester }))
+        .filter((f: any) => f.friend != null);
       setIncoming(enriched);
     }
 

@@ -24,14 +24,13 @@ function avatarColor(username: string): string {
 }
 
 function Avatar({ username, size = 44 }: { username: string; size?: number }) {
+  const letter = username?.[0]?.toUpperCase() ?? '?';
   return (
     <View style={[
       styles.avatar,
-      { width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username) }
+      { width: size, height: size, borderRadius: size / 2, backgroundColor: avatarColor(username ?? '') }
     ]}>
-      <Text style={[styles.avatarText, { fontSize: size * 0.4 }]}>
-        {username[0].toUpperCase()}
-      </Text>
+      <Text style={[styles.avatarText, { fontSize: size * 0.4 }]}>{letter}</Text>
     </View>
   );
 }

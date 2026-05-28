@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { registerForPushNotifications } from '../lib/notifications';
 
 interface Profile {
   id: string;
@@ -33,7 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
-      if (data.session) loadProfile(data.session.user.id);
+      if (data.session) {
+        loadProfile(data.session.user.id);
+        registerForPushNotifications(data.session.user.id).catch(() => {});
+      }
       setLoading(false);
     });
 
@@ -41,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(newSession);
       if (newSession) {
         loadProfile(newSession.user.id);
+        registerForPushNotifications(newSession.user.id).catch(() => {});
       } else {
         setProfile(null);
       }

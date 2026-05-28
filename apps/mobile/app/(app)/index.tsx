@@ -10,9 +10,11 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/context/auth';
 import { useHabits } from '../../src/hooks/useHabits';
+import { useFriendFeed } from '../../src/hooks/useFriendFeed';
 import { HabitCard } from '../../src/components/HabitCard';
 import { AddHabitModal } from '../../src/components/AddHabitModal';
 import { NumericCheckInModal } from '../../src/components/NumericCheckInModal';
+import { FriendFeedSection } from '../../src/components/FriendFeedSection';
 import { NavBar } from '../../src/components/NavBar';
 import { Colors, Fonts } from '../../src/lib/theme';
 import { formatDisplayDate } from '../../src/lib/date';
@@ -21,12 +23,18 @@ import type { HabitWithStatus } from '../../src/hooks/useHabits';
 export default function DashboardScreen() {
   const router = useRouter();
   const { profile } = useAuth();
-  const { habits, loading, refresh, createHabit, checkInBinary, checkInNumeric } = useHabits();
+  const { habits, loading: habitsLoading, refresh: refreshHabits, createHabit, checkInBinary, checkInNumeric } = useHabits();
+  const { friends, loading: feedLoading, refresh: refreshFeed } = useFriendFeed();
 
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [numericHabit, setNumericHabit] = useState<HabitWithStatus | null>(null);
 
+  const loading = habitsLoading || feedLoading;
   const done = habits.filter((h) => h.todayCheckIn?.completed).length;
+
+  async function handleRefresh() {
+    await Promise.all([refreshHabits(), refreshFeed()]);
+  }
   const firstName = profile?.display_name?.split(' ')[0] ?? profile?.username ?? '…';
 
   return (
@@ -34,7 +42,7 @@ export default function DashboardScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} tintColor={Colors.inkMuted} />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={handleRefresh} tintColor={Colors.inkMuted} />}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -78,6 +86,9 @@ export default function DashboardScreen() {
             />
           ))}
         </View>
+
+        {/* Friends feed */}
+        <FriendFeedSection friends={friends} />
       </ScrollView>
 
       {/* Modals */}

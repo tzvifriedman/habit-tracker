@@ -1,22 +1,62 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/context/auth';
 import { useHabits } from '../../src/hooks/useHabits';
 import { NavBar } from '../../src/components/NavBar';
 import { Colors, Fonts } from '../../src/lib/theme';
+import { supabase } from '../../src/lib/supabase';
+import { today, computeStreak } from '../../src/lib/date';
+
+function useProfileStats(userId: string | undefined) {
+  const [streak, setStreak] = useState(0);
+  const [friendCount, setFriendCount] = useState(0);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const since = oneYearAgo.toLocaleDateString('en-CA');
+
+    Promise.all([
+      supabase
+        .from('check_ins')
+        .select('for_date')
+        .eq('user_id', userId)
+        .eq('completed', true)
+        .gte('for_date', since),
+      supabase
+        .from('friendships')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'accepted')
+        .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`),
+    ]).then(([checkInsRes, friendsRes]) => {
+      if (!checkInsRes.error) {
+        const uniqueDates = [...new Set((checkInsRes.data ?? []).map((r: any) => r.for_date))];
+        setStreak(computeStreak(uniqueDates, today()));
+      }
+      if (!friendsRes.error) {
+        setFriendCount(friendsRes.count ?? 0);
+      }
+    });
+  }, [userId]);
+
+  return { streak, friendCount };
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { profile, signOut } = useAuth();
+  const { profile, user, signOut } = useAuth();
   const { habits } = useHabits();
+  const { streak, friendCount } = useProfileStats(user?.id);
 
   const initial = (profile?.display_name ?? profile?.username ?? '?')[0].toUpperCase();
-  const streak = 0; // Phase 5 will compute real streak
 
   return (
     <View style={styles.container}>
-      <View style={styles.inner}>
-        {/* Avatar */}
+      <ScrollView contentContainerStyle={styles.inner}>
+        {/* Avatar + name */}
         <View style={styles.avatarWrap}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initial}</Text>
@@ -36,25 +76,17 @@ export default function ProfileScreen() {
             <Text style={styles.statLabel}>Habits</Text>
           </View>
           <View style={styles.stat}>
-            <Text style={styles.statNum}>0</Text>
+            <Text style={styles.statNum}>{friendCount}</Text>
             <Text style={styles.statLabel}>Friends</Text>
           </View>
         </View>
 
-        {/* Settings rows */}
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.rowLabel}>Notifications</Text>
-          <Text style={styles.rowValue}>On</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.rowLabel}>Change password</Text>
-          <Text style={styles.rowChev}>→</Text>
-        </TouchableOpacity>
+        {/* Settings */}
         <TouchableOpacity style={styles.row} onPress={signOut}>
           <Text style={[styles.rowLabel, { color: Colors.terracotta }]}>Sign out</Text>
           <Text style={styles.rowChev}>→</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       <NavBar
         activeTab="profile"
@@ -70,7 +102,7 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.paper },
-  inner: { flex: 1, paddingHorizontal: 28, paddingTop: 32, paddingBottom: 108 },
+  inner: { paddingHorizontal: 28, paddingTop: 32, paddingBottom: 108 },
   avatarWrap: { alignItems: 'center', paddingVertical: 24, marginBottom: 24 },
   avatar: {
     width: 80, height: 80, borderRadius: 40,
@@ -83,21 +115,17 @@ const styles = StyleSheet.create({
   handle: { fontFamily: Fonts.sans400, fontSize: 12, color: Colors.inkMuted, letterSpacing: 0.5, marginTop: 4 },
   stats: { flexDirection: 'row', gap: 10, marginBottom: 28 },
   stat: {
-    flex: 1,
-    backgroundColor: Colors.card,
+    flex: 1, backgroundColor: Colors.card,
     borderWidth: 1, borderColor: Colors.cardLine,
     borderRadius: 14, padding: 18, alignItems: 'center',
   },
   statNum: { fontFamily: Fonts.serif300, fontSize: 32, color: Colors.ink, lineHeight: 36 },
   statLabel: { fontFamily: Fonts.sans400, fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: Colors.inkMuted, marginTop: 8 },
   row: {
-    backgroundColor: Colors.card,
-    borderWidth: 1, borderColor: Colors.cardLine,
+    backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.cardLine,
     borderRadius: 12, padding: 14, paddingHorizontal: 16,
-    marginBottom: 8, flexDirection: 'row',
-    justifyContent: 'space-between', alignItems: 'center',
+    marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
   rowLabel: { fontFamily: Fonts.sans400, fontSize: 14, color: Colors.ink },
-  rowValue: { fontFamily: Fonts.sans400, fontSize: 14, color: Colors.inkMuted },
   rowChev: { fontFamily: Fonts.sans400, fontSize: 14, color: Colors.inkMuted },
 });

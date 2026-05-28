@@ -48,15 +48,12 @@ export default function SignupScreen() {
     setLoading(false);
 
     if (error) {
-      // Generic message — don't expose whether the email already exists
       Alert.alert("Couldn't create account", 'Please check your details and try again.');
       return;
     }
 
-    Alert.alert(
-      'Check your email',
-      `We sent a verification link to ${email}. Tap it to activate your account.`,
-    );
+    // email confirmations disabled — session is active immediately after signUp
+    // AuthProvider's onAuthStateChange will fire and redirect to (app)
   }
 
   return (

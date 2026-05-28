@@ -39,8 +39,7 @@ major_version = 17
 enabled = false
 # Port to use for the local connection pooler.
 port = 54329
-# Specifies when a server connection can be reused by other clients.
-# Configure one of the supported pooler modes: `transaction`, `session`.
+# Specifies when a server connection can be reused by other clients.  # Configure one of the supported pooler modes: `transaction`, `session`.
 pool_mode = "transaction"
 # How many server connections to allow per user/database pair.
 default_pool_size = 20
@@ -223,7 +222,7 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = true
+enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = true
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -370,6 +369,10 @@ enabled = false
 authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
+
+[functions.notify-checkin]
+# Called from a DB trigger (no user JWT). The function uses SUPABASE_SERVICE_ROLE_KEY internally.
+verify_jwt = false
 
 [edge_runtime]
 enabled = true
