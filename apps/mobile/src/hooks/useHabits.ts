@@ -207,5 +207,10 @@ export function useHabits() {
     );
   }
 
-  return { habits, loading, error, refresh, createHabit, checkInBinary, checkInNumeric };
+  async function archiveHabit(habitId: string) {
+    setHabits((prev) => prev.filter((h) => h.id !== habitId));
+    await supabase.from('habits').update({ archived_at: new Date().toISOString() }).eq('id', habitId);
+  }
+
+  return { habits, loading, error, refresh, createHabit, checkInBinary, checkInNumeric, archiveHabit };
 }

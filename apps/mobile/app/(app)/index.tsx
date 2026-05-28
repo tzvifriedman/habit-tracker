@@ -23,7 +23,7 @@ import type { HabitWithStatus } from '../../src/hooks/useHabits';
 export default function DashboardScreen() {
   const router = useRouter();
   const { profile } = useAuth();
-  const { habits, loading: habitsLoading, refresh: refreshHabits, createHabit, checkInBinary, checkInNumeric } = useHabits();
+  const { habits, loading: habitsLoading, refresh: refreshHabits, createHabit, checkInBinary, checkInNumeric, archiveHabit } = useHabits();
   const { friends, loading: feedLoading, refresh: refreshFeed } = useFriendFeed();
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -83,6 +83,7 @@ export default function DashboardScreen() {
               habit={habit}
               onToggle={() => checkInBinary(habit)}
               onNumericPress={() => setNumericHabit(habit)}
+              onArchive={() => archiveHabit(habit.id)}
             />
           ))}
         </View>
