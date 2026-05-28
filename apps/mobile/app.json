@@ -28,7 +28,7 @@
       }
     },
     "web": {
-      "output": "spa",
+      "output": "single",
       "favicon": "./assets/favicon.png",
       "name": "Habits",
       "shortName": "Habits",
