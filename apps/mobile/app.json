@@ -19,8 +19,9 @@
     "android": {
       "package": "com.habittracker.app",
       "adaptiveIcon": {
-        "backgroundColor": "#F1ECE2",
-        "foregroundImage": "./assets/adaptive-icon.png"
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
       }
     },
     "web": {
@@ -52,7 +53,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
+          "icon": "./assets/icon.png",
           "color": "#1A1A1A",
           "androidMode": "default"
         }
