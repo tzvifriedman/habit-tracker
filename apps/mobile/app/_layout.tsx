@@ -1,14 +1,12 @@
 import 'react-native-url-polyfill/auto';
 import { useEffect } from 'react';
-import { AppState, View } from 'react-native';
+import { AppState, Platform, View } from 'react-native';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setupNotificationHandler } from '../src/lib/notifications';
-
-if (Platform.OS !== 'web') setupNotificationHandler();
 import {
   useFonts,
   Fraunces_300Light,
@@ -22,6 +20,7 @@ import {
 import { AuthProvider, useAuth } from '../src/context/auth';
 import { checkForUpdate } from '../src/lib/updates';
 
+if (Platform.OS !== 'web') setupNotificationHandler();
 if (Platform.OS !== 'web') SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
