@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Alert } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { today, last7Days } from '../lib/date';
 import { useAuth } from '../context/auth';
@@ -127,6 +128,7 @@ export function useHabits() {
 
     if (error) {
       setHabits((prev) => prev.filter((h) => h.id !== optimistic.id));
+      Alert.alert('Could not save habit', error.message);
       return false;
     }
 

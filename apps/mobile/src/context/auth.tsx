@@ -1,7 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import type { Profile } from '@habit-tracker/types';
+
+interface Profile {
+  id: string;
+  username: string;
+  display_name: string | null;
+  quiet_hours_start: string | null;
+  quiet_hours_end: string | null;
+  created_at: string;
+}
 
 interface AuthState {
   session: Session | null;
@@ -47,7 +55,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .select('*')
       .eq('id', userId)
       .single();
-    setProfile(data ?? null);
+
+    if (data) {
+      setProfile(data);
+      return;
+    }
+
+    // Profile missing — user signed up before migration was applied.
+    // Create it now using metadata from the auth record.
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    const meta = authUser?.user_metadata ?? {};
+    const fallbackUsername = `user_${userId.slice(0, 8)}`;
+    await supabase.from('profiles').insert({
+      id: userId,
+      username: meta.username ?? fallbackUsername,
+      display_name: meta.display_name ?? null,
+    });
+
+    const { data: created } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    setProfile(created ?? null);
   }
 
   async function signOut() {
