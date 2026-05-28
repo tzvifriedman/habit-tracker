@@ -27,3 +27,4 @@ supabase/.temp/
 .vscode/
 .idea/
 *.swp
+.expo/
