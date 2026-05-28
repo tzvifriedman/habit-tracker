@@ -2,6 +2,7 @@
   "expo": {
     "name": "Habits",
     "slug": "habit-tracker",
+    "scheme": "habit-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -56,7 +57,9 @@
           "androidMode": "default"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font",
+      "expo-splash-screen"
     ]
   }
 }
