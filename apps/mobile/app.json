@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Habits",
+    "slug": "habit-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F1ECE2"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.habittracker.app"
+    },
+    "android": {
+      "package": "com.habittracker.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#F1ECE2",
+        "foregroundImage": "./assets/adaptive-icon.png"
+      }
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/favicon.png",
+      "name": "Habits",
+      "shortName": "Habits",
+      "description": "Track habits with friends",
+      "themeColor": "#1A1A1A",
+      "backgroundColor": "#F1ECE2",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1A1A1A",
+          "androidMode": "default"
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}
