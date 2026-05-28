@@ -8,7 +8,7 @@ import * as Notifications from 'expo-notifications';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setupNotificationHandler } from '../src/lib/notifications';
 
-setupNotificationHandler();
+if (Platform.OS !== 'web') setupNotificationHandler();
 import {
   useFonts,
   Fraunces_300Light,
@@ -22,7 +22,7 @@ import {
 import { AuthProvider, useAuth } from '../src/context/auth';
 import { checkForUpdate } from '../src/lib/updates';
 
-SplashScreen.preventAutoHideAsync();
+if (Platform.OS !== 'web') SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { session, loading } = useAuth();
@@ -43,6 +43,7 @@ function RootNavigator() {
   }, [session, loading, segments]);
 
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     const sub = AppState.addEventListener('change', (state) => {
       if (state === 'active') checkForUpdate();
     });
@@ -50,7 +51,7 @@ function RootNavigator() {
   }, []);
 
   useEffect(() => {
-    // Navigate to the dashboard when the user taps a notification
+    if (Platform.OS === 'web') return;
     const sub = Notifications.addNotificationResponseReceivedListener(() => {
       router.push('/(app)/');
     });
@@ -79,7 +80,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
+    if (fontsLoaded && Platform.OS !== 'web') SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
