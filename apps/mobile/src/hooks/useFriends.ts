@@ -28,7 +28,7 @@ export function useFriends() {
     if (!user) return;
     setLoading(true);
 
-    const [acceptedRes, incomingRes] = await Promise.all([
+    const [acceptedRes, pendingRes] = await Promise.all([
       supabase
         .from('friendships')
         .select(`
@@ -41,10 +41,7 @@ export function useFriends() {
 
       supabase
         .from('friendships')
-        .select(`
-          id, requester_id, addressee_id, status, created_at,
-          requester:profiles!requester_id(id, username, display_name)
-        `)
+        .select('id, requester_id, addressee_id, status, created_at')
         .eq('addressee_id', user.id)
         .eq('status', 'pending'),
     ]);
@@ -59,11 +56,21 @@ export function useFriends() {
       setFriends(enriched);
     }
 
-    if (!incomingRes.error) {
-      const enriched = (incomingRes.data ?? [])
-        .map((f: any) => ({ ...f, friend: f.requester }))
+    const pendingRows = pendingRes.data ?? [];
+    if (pendingRows.length > 0) {
+      const requesterIds = pendingRows.map((f: any) => f.requester_id);
+      const { data: profileRows } = await supabase
+        .from('profiles')
+        .select('id, username, display_name')
+        .in('id', requesterIds);
+      const profileMap: Record<string, FriendProfile> = {};
+      for (const p of profileRows ?? []) profileMap[p.id] = p;
+      const enriched = pendingRows
+        .map((f: any) => ({ ...f, friend: profileMap[f.requester_id] ?? null }))
         .filter((f: any) => f.friend != null);
       setIncoming(enriched);
+    } else {
+      setIncoming([]);
     }
 
     setLoading(false);
