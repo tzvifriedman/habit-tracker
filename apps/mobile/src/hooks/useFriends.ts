@@ -111,14 +111,27 @@ export function useFriends() {
   }
 
   async function respond(friendshipId: string, action: 'accept' | 'decline') {
+    // Optimistic: remove from incoming list immediately
+    setIncoming((prev) => prev.filter((f) => f.id !== friendshipId));
+
     if (action === 'accept') {
-      await supabase
+      const { data, error } = await supabase
         .from('friendships')
         .update({ status: 'accepted', responded_at: new Date().toISOString() })
-        .eq('id', friendshipId);
+        .eq('id', friendshipId)
+        .select('id');
+      if (error || !data?.length) {
+        Alert.alert('Could not accept request', error?.message ?? 'No matching row — check RLS');
+        refresh();
+        return;
+      }
     } else {
-      // Decline = delete the row
-      await supabase.from('friendships').delete().eq('id', friendshipId);
+      const { error } = await supabase.from('friendships').delete().eq('id', friendshipId);
+      if (error) {
+        Alert.alert('Could not decline request', error.message);
+        refresh();
+        return;
+      }
     }
     refresh();
   }
