@@ -34,11 +34,17 @@
       "orientation": "portrait",
       "startUrl": "/"
     },
+    "owner": "tzvifriedman1",
     "updates": {
-      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID"
+      "url": "https://u.expo.dev/fe1f3dd3-549d-4015-9a31-0b1839e6bba6"
     },
     "runtimeVersion": {
       "policy": "appVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fe1f3dd3-549d-4015-9a31-0b1839e6bba6"
+      }
     },
     "plugins": [
       "expo-router",
