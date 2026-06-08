@@ -1,62 +1,32 @@
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { Colors, Fonts } from '../lib/theme';
 
+type Tab = 'index' | 'friends' | 'habits' | 'profile';
+
 interface Props {
-  activeTab: 'index' | 'friends' | 'profile';
-  onTabChange: (tab: 'index' | 'friends' | 'profile') => void;
-  onAddHabit: () => void;
+  activeTab: Tab;
+  onTabChange: (tab: Tab) => void;
 }
 
-function HomeIcon({ active }: { active: boolean }) {
-  return (
-    <Text style={{ fontSize: 20, color: active ? Colors.ink : Colors.inkMuted }}>⌂</Text>
-  );
-}
+const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'index',   label: 'Today',   icon: '⌂' },
+  { id: 'friends', label: 'Friends', icon: '◎' },
+  { id: 'habits',  label: 'Habits',  icon: '▦' },
+  { id: 'profile', label: 'You',     icon: '◉' },
+];
 
-function FriendsIcon({ active }: { active: boolean }) {
-  return (
-    <Text style={{ fontSize: 18, color: active ? Colors.ink : Colors.inkMuted }}>◎</Text>
-  );
-}
-
-function ProfileIcon({ active }: { active: boolean }) {
-  return (
-    <Text style={{ fontSize: 18, color: active ? Colors.ink : Colors.inkMuted }}>◉</Text>
-  );
-}
-
-const TABS = [
-  { id: 'index' as const, label: 'Today', Icon: HomeIcon },
-  { id: 'friends' as const, label: 'Friends', Icon: FriendsIcon },
-] as const;
-
-const RIGHT_TABS = [
-  { id: 'profile' as const, label: 'You', Icon: ProfileIcon },
-] as const;
-
-export function NavBar({ activeTab, onTabChange, onAddHabit }: Props) {
+export function NavBar({ activeTab, onTabChange }: Props) {
   return (
     <View style={styles.bar}>
-      {TABS.map(({ id, label, Icon }) => (
-        <TouchableOpacity key={id} style={styles.tab} onPress={() => onTabChange(id)}>
-          <Icon active={activeTab === id} />
-          <Text style={[styles.label, activeTab === id && styles.labelActive]}>{label}</Text>
-        </TouchableOpacity>
-      ))}
-
-      <TouchableOpacity style={styles.fab} onPress={onAddHabit} activeOpacity={0.8}>
-        <Text style={styles.fabPlus}>+</Text>
-      </TouchableOpacity>
-
-      {RIGHT_TABS.map(({ id, label, Icon }) => (
-        <TouchableOpacity key={id} style={styles.tab} onPress={() => onTabChange(id)}>
-          <Icon active={activeTab === id} />
-          <Text style={[styles.label, activeTab === id && styles.labelActive]}>{label}</Text>
-        </TouchableOpacity>
-      ))}
-
-      {/* Spacer tab to balance layout */}
-      <View style={styles.tab} />
+      {TABS.map(({ id, label, icon }) => {
+        const active = activeTab === id;
+        return (
+          <TouchableOpacity key={id} style={styles.tab} onPress={() => onTabChange(id)}>
+            <Text style={[styles.icon, active && styles.iconActive]}>{icon}</Text>
+            <Text style={[styles.label, active && styles.labelActive]}>{label}</Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
@@ -68,7 +38,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: Platform.OS === 'ios' ? 88 : 72,
-    backgroundColor: 'rgba(241,236,226,0.92)',
+    backgroundColor: 'rgba(241,236,226,0.96)',
     borderTopWidth: 1,
     borderTopColor: Colors.cardLine,
     flexDirection: 'row',
@@ -81,6 +51,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
   },
+  icon: {
+    fontSize: 19,
+    color: Colors.inkMuted,
+  },
+  iconActive: {
+    color: Colors.ink,
+  },
   label: {
     fontFamily: Fonts.sans400,
     fontSize: 9,
@@ -90,20 +67,5 @@ const styles = StyleSheet.create({
   },
   labelActive: {
     color: Colors.ink,
-  },
-  fab: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: Colors.ink,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: -10,
-  },
-  fabPlus: {
-    color: Colors.paper,
-    fontSize: 26,
-    lineHeight: 30,
-    fontWeight: '300',
   },
 });

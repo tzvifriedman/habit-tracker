@@ -198,9 +198,9 @@ export default function FriendsScreen() {
         activeTab="friends"
         onTabChange={(tab) => {
           if (tab === 'index') router.push('/(app)/');
+          if (tab === 'habits') router.push('/(app)/habits');
           if (tab === 'profile') router.push('/(app)/profile');
         }}
-        onAddHabit={() => router.push('/(app)/')}
       />
     </View>
   );

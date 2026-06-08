@@ -93,8 +93,8 @@ export default function ProfileScreen() {
         onTabChange={(tab) => {
           if (tab === 'index') router.push('/(app)/');
           if (tab === 'friends') router.push('/(app)/friends');
+          if (tab === 'habits') router.push('/(app)/habits');
         }}
-        onAddHabit={() => router.push('/(app)/')}
       />
     </View>
   );

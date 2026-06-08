@@ -28,3 +28,4 @@ supabase/.temp/
 .idea/
 *.swp
 .expo/
+.claude/

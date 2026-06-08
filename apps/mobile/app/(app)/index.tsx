@@ -12,7 +12,6 @@ import { useAuth } from '../../src/context/auth';
 import { useHabits } from '../../src/hooks/useHabits';
 import { useFriendFeed } from '../../src/hooks/useFriendFeed';
 import { HabitCard } from '../../src/components/HabitCard';
-import { AddHabitModal } from '../../src/components/AddHabitModal';
 import { NumericCheckInModal } from '../../src/components/NumericCheckInModal';
 import { FriendFeedSection } from '../../src/components/FriendFeedSection';
 import { NavBar } from '../../src/components/NavBar';
@@ -23,10 +22,9 @@ import type { HabitWithStatus } from '../../src/hooks/useHabits';
 export default function DashboardScreen() {
   const router = useRouter();
   const { profile } = useAuth();
-  const { habits, loading: habitsLoading, refresh: refreshHabits, createHabit, checkInBinary, checkInNumeric, archiveHabit } = useHabits();
+  const { habits, loading: habitsLoading, refresh: refreshHabits, checkInBinary, checkInNumeric } = useHabits();
   const { friends, loading: feedLoading, refresh: refreshFeed } = useFriendFeed();
 
-  const [showAddHabit, setShowAddHabit] = useState(false);
   const [numericHabit, setNumericHabit] = useState<HabitWithStatus | null>(null);
 
   const loading = habitsLoading || feedLoading;
@@ -83,7 +81,7 @@ export default function DashboardScreen() {
               habit={habit}
               onToggle={() => checkInBinary(habit)}
               onNumericPress={() => setNumericHabit(habit)}
-              onArchive={() => archiveHabit(habit.id)}
+              onArchive={() => {}}
             />
           ))}
         </View>
@@ -92,12 +90,6 @@ export default function DashboardScreen() {
         <FriendFeedSection friends={friends} />
       </ScrollView>
 
-      {/* Modals */}
-      <AddHabitModal
-        visible={showAddHabit}
-        onClose={() => setShowAddHabit(false)}
-        onCreate={createHabit}
-      />
       <NumericCheckInModal
         habit={numericHabit}
         onClose={() => setNumericHabit(null)}
@@ -109,9 +101,9 @@ export default function DashboardScreen() {
         activeTab="index"
         onTabChange={(tab) => {
           if (tab === 'friends') router.push('/(app)/friends');
+          if (tab === 'habits') router.push('/(app)/habits');
           if (tab === 'profile') router.push('/(app)/profile');
         }}
-        onAddHabit={() => setShowAddHabit(true)}
       />
     </View>
   );

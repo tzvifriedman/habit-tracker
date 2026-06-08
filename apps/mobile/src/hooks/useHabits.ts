@@ -214,5 +214,16 @@ export function useHabits() {
     await supabase.from('habits').update({ archived_at: new Date().toISOString() }).eq('id', habitId);
   }
 
-  return { habits, loading, error, refresh, createHabit, checkInBinary, checkInNumeric, archiveHabit };
+  async function updateHabit(habitId: string, params: {
+    title?: string;
+    target_value?: number | null;
+    target_unit?: string | null;
+    direction?: 'at_least' | 'at_most' | null;
+  }) {
+    setHabits((prev) => prev.map((h) => h.id === habitId ? { ...h, ...params } : h));
+    const { error } = await supabase.from('habits').update(params).eq('id', habitId);
+    if (error) { refresh(); Alert.alert('Could not update habit', error.message); }
+  }
+
+  return { habits, loading, error, refresh, createHabit, checkInBinary, checkInNumeric, archiveHabit, updateHabit };
 }

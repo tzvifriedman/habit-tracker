@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, StyleSheet, Alert } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { WeekDots } from './WeekDots';
 import { Colors, Fonts } from '../lib/theme';
 import type { HabitWithStatus } from '../hooks/useHabits';
@@ -10,24 +10,13 @@ interface Props {
   onArchive: () => void;
 }
 
-export function HabitCard({ habit, onToggle, onNumericPress, onArchive }: Props) {
+export function HabitCard({ habit, onToggle, onNumericPress }: Props) {
   const done = habit.todayCheckIn?.completed ?? false;
   const value = habit.todayCheckIn?.value;
 
   function handlePress() {
     if (habit.habit_type === 'binary') onToggle();
     else onNumericPress();
-  }
-
-  function handleLongPress() {
-    Alert.alert(
-      'Remove habit',
-      `Remove "${habit.title}"? Your check-in history will be kept.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive', onPress: onArchive },
-      ],
-    );
   }
 
   const metaText = habit.habit_type === 'binary'
@@ -38,7 +27,6 @@ export function HabitCard({ habit, onToggle, onNumericPress, onArchive }: Props)
     <TouchableOpacity
       style={[styles.card, done && styles.cardDone]}
       onPress={handlePress}
-      onLongPress={handleLongPress}
       activeOpacity={0.75}
     >
       <View style={[styles.check, done && styles.checkDone]}>
