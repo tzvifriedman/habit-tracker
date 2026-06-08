@@ -54,8 +54,8 @@ function EditHabitModal({
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.sheetWrap}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <View style={styles.sheet}>
           <View style={styles.handle} />
           <Text style={styles.sheetTitle}>Edit habit</Text>
@@ -66,7 +66,6 @@ function EditHabitModal({
             onChangeText={setTitle}
             placeholder="Habit name"
             placeholderTextColor={Colors.inkMuted}
-            autoFocus
           />
 
           {habit.habit_type === 'numeric' && (
@@ -284,7 +283,7 @@ const styles = StyleSheet.create({
 
   // Edit modal
   backdrop: { flex: 1, backgroundColor: 'rgba(26,26,26,0.4)' },
-  sheetWrap: { position: 'absolute', bottom: 0, left: 0, right: 0 },
+  sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(26,26,26,0.4)' },
   sheet: {
     backgroundColor: Colors.paper,
     borderRadius: 32,
