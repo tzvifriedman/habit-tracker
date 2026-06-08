@@ -19,13 +19,15 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function signIn() {
     if (!email || !password) return;
+    setErrorMsg(null);
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) Alert.alert('Sign in failed', error.message);
+    if (error) setErrorMsg(error.message);
     // On success the AuthProvider session change redirects automatically
   }
 
@@ -81,6 +83,10 @@ export default function LoginScreen() {
               : <Text style={styles.buttonText}>Sign in</Text>
             }
           </TouchableOpacity>
+
+          {errorMsg && (
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          )}
 
           <Link href="/(auth)/forgot-password" asChild>
             <TouchableOpacity style={styles.forgotWrap}>
@@ -176,6 +182,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Colors.paper,
     letterSpacing: 0.3,
+  },
+  errorText: {
+    fontFamily: Fonts.sans400,
+    fontSize: 13,
+    color: Colors.terracotta,
+    textAlign: 'center',
+    marginTop: 12,
   },
   forgotWrap: {
     alignItems: 'center',

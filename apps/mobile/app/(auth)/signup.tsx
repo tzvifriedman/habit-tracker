@@ -22,19 +22,21 @@ export default function SignupScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function signUp() {
     if (!email || !username || !password) return;
 
     if (!USERNAME_RE.test(username)) {
-      Alert.alert('Invalid username', '3–20 characters, lowercase letters, numbers, and underscores only.');
+      setErrorMsg('3–20 characters, lowercase letters, numbers, and underscores only.');
       return;
     }
     if (password.length < 8) {
-      Alert.alert('Weak password', 'Password must be at least 8 characters.');
+      setErrorMsg('Password must be at least 8 characters.');
       return;
     }
 
+    setErrorMsg(null);
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -48,7 +50,7 @@ export default function SignupScreen() {
     setLoading(false);
 
     if (error) {
-      Alert.alert("Couldn't create account", error.message);
+      setErrorMsg(error.message);
       return;
     }
 
@@ -120,6 +122,10 @@ export default function SignupScreen() {
               : <Text style={styles.buttonText}>Create account</Text>
             }
           </TouchableOpacity>
+
+          {errorMsg && (
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          )}
         </View>
 
         <View style={styles.toggleWrap}>
@@ -188,6 +194,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: { fontFamily: Fonts.sans500, fontSize: 15, color: Colors.paper, letterSpacing: 0.3 },
+  errorText: {
+    fontFamily: Fonts.sans400,
+    fontSize: 13,
+    color: Colors.terracotta,
+    textAlign: 'center',
+    marginTop: 12,
+  },
   toggleWrap: {
     flexDirection: 'row',
     justifyContent: 'center',
