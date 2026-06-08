@@ -89,7 +89,7 @@ function RequestRow({
 
 export default function FriendsScreen() {
   const router = useRouter();
-  const { friends, incoming, loading, refresh, sendRequest, respond, removeFriend } = useFriends();
+  const { friends, incoming, loading, debugInfo, refresh, sendRequest, respond, removeFriend } = useFriends();
   const [username, setUsername] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -125,6 +125,7 @@ export default function FriendsScreen() {
           <>
             <Text style={styles.title}>Friends</Text>
             <Text style={styles.sub}>Add by username — they'll see your habits too.</Text>
+            {debugInfo && <Text style={{ fontSize: 11, color: 'gray', marginBottom: 8 }}>{debugInfo}</Text>}
 
             {/* Add friend input */}
             <View style={styles.addRow}>

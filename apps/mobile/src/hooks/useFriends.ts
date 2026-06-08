@@ -23,6 +23,7 @@ export function useFriends() {
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [incoming, setIncoming] = useState<Friendship[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -56,21 +57,28 @@ export function useFriends() {
       setFriends(enriched);
     }
 
-    const pendingRows = pendingRes.data ?? [];
-    if (pendingRows.length > 0) {
-      const requesterIds = pendingRows.map((f: any) => f.requester_id);
-      const { data: profileRows } = await supabase
-        .from('profiles')
-        .select('id, username, display_name')
-        .in('id', requesterIds);
-      const profileMap: Record<string, FriendProfile> = {};
-      for (const p of profileRows ?? []) profileMap[p.id] = p;
-      const enriched = pendingRows
-        .map((f: any) => ({ ...f, friend: profileMap[f.requester_id] ?? null }))
-        .filter((f: any) => f.friend != null);
-      setIncoming(enriched);
-    } else {
+    if (pendingRes.error) {
+      setDebugInfo(`pending query error: ${pendingRes.error.message}`);
       setIncoming([]);
+    } else {
+      const pendingRows = pendingRes.data ?? [];
+      setDebugInfo(`pending rows: ${pendingRows.length}, user: ${user.id}`);
+      if (pendingRows.length > 0) {
+        const requesterIds = pendingRows.map((f: any) => f.requester_id);
+        const { data: profileRows, error: profileErr } = await supabase
+          .from('profiles')
+          .select('id, username, display_name')
+          .in('id', requesterIds);
+        if (profileErr) setDebugInfo(`profile fetch error: ${profileErr.message}`);
+        const profileMap: Record<string, FriendProfile> = {};
+        for (const p of profileRows ?? []) profileMap[p.id] = p;
+        const enriched = pendingRows
+          .map((f: any) => ({ ...f, friend: profileMap[f.requester_id] ?? null }))
+          .filter((f: any) => f.friend != null);
+        setIncoming(enriched);
+      } else {
+        setIncoming([]);
+      }
     }
 
     setLoading(false);
@@ -148,5 +156,5 @@ export function useFriends() {
     refresh();
   }
 
-  return { friends, incoming, loading, refresh, sendRequest, respond, removeFriend };
+  return { friends, incoming, loading, debugInfo, refresh, sendRequest, respond, removeFriend };
 }
