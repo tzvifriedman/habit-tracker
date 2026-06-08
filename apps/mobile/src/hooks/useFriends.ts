@@ -29,7 +29,7 @@ export function useFriends() {
     if (!user) return;
     setLoading(true);
 
-    const [acceptedRes, pendingRes] = await Promise.all([
+    const [acceptedRes] = await Promise.all([
       supabase
         .from('friendships')
         .select(`
@@ -39,12 +39,6 @@ export function useFriends() {
         `)
         .eq('status', 'accepted')
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`),
-
-      supabase
-        .from('friendships')
-        .select('id, requester_id, addressee_id, status, created_at')
-        .eq('addressee_id', user.id)
-        .eq('status', 'pending'),
     ]);
 
     if (!acceptedRes.error) {
@@ -57,28 +51,21 @@ export function useFriends() {
       setFriends(enriched);
     }
 
-    if (pendingRes.error) {
-      setDebugInfo(`pending query error: ${pendingRes.error.message}`);
+    const { data: pendingData, error: pendingErr } = await supabase.rpc('get_pending_requests');
+    if (pendingErr) {
+      setDebugInfo(`rpc error: ${pendingErr.message}`);
       setIncoming([]);
     } else {
-      const pendingRows = pendingRes.data ?? [];
-      setDebugInfo(`pending rows: ${pendingRows.length}, user: ${user.id}`);
-      if (pendingRows.length > 0) {
-        const requesterIds = pendingRows.map((f: any) => f.requester_id);
-        const { data: profileRows, error: profileErr } = await supabase
-          .from('profiles')
-          .select('id, username, display_name')
-          .in('id', requesterIds);
-        if (profileErr) setDebugInfo(`profile fetch error: ${profileErr.message}`);
-        const profileMap: Record<string, FriendProfile> = {};
-        for (const p of profileRows ?? []) profileMap[p.id] = p;
-        const enriched = pendingRows
-          .map((f: any) => ({ ...f, friend: profileMap[f.requester_id] ?? null }))
-          .filter((f: any) => f.friend != null);
-        setIncoming(enriched);
-      } else {
-        setIncoming([]);
-      }
+      setDebugInfo(null);
+      const enriched = (pendingData ?? []).map((row: any) => ({
+        id: row.id,
+        requester_id: row.requester_id,
+        addressee_id: user.id,
+        status: 'pending' as const,
+        created_at: row.created_at,
+        friend: { id: row.requester_id, username: row.username, display_name: row.display_name },
+      }));
+      setIncoming(enriched);
     }
 
     setLoading(false);
