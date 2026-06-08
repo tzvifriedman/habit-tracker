@@ -48,7 +48,7 @@ export default function SignupScreen() {
     setLoading(false);
 
     if (error) {
-      Alert.alert("Couldn't create account", 'Please check your details and try again.');
+      Alert.alert("Couldn't create account", error.message);
       return;
     }
 

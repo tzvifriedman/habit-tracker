@@ -25,7 +25,7 @@ export default function LoginScreen() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) Alert.alert('Sign in failed', 'Invalid email or password.');
+    if (error) Alert.alert('Sign in failed', error.message);
     // On success the AuthProvider session change redirects automatically
   }
 

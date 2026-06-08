@@ -67,7 +67,9 @@ export function useHabits() {
     ]);
 
     if (habitsRes.error || checkInsRes.error) {
-      setError('Failed to load habits.');
+      const msg = (habitsRes.error ?? checkInsRes.error)!.message;
+      setError(msg);
+      Alert.alert('Could not load habits', msg);
       setLoading(false);
       return;
     }
