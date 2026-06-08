@@ -23,7 +23,6 @@ export function useFriends() {
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [incoming, setIncoming] = useState<Friendship[]>([]);
   const [loading, setLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -53,10 +52,8 @@ export function useFriends() {
 
     const { data: pendingData, error: pendingErr } = await supabase.rpc('get_pending_requests');
     if (pendingErr) {
-      setDebugInfo(`rpc error: ${pendingErr.message}`);
       setIncoming([]);
     } else {
-      setDebugInfo(null);
       const enriched = (pendingData ?? []).map((row: any) => ({
         id: row.id,
         requester_id: row.requester_id,
@@ -143,5 +140,5 @@ export function useFriends() {
     refresh();
   }
 
-  return { friends, incoming, loading, debugInfo, refresh, sendRequest, respond, removeFriend };
+  return { friends, incoming, loading, refresh, sendRequest, respond, removeFriend };
 }

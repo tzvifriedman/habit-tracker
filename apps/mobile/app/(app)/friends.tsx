@@ -125,7 +125,6 @@ export default function FriendsScreen() {
           <>
             <Text style={styles.title}>Friends</Text>
             <Text style={styles.sub}>Add by username — they'll see your habits too.</Text>
-            {debugInfo && <Text style={{ fontSize: 11, color: 'gray', marginBottom: 8 }}>{debugInfo}</Text>}
 
             {/* Add friend input */}
             <View style={styles.addRow}>
